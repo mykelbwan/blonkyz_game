@@ -1,0 +1,17 @@
+{
+  "name": "blonkyz-runner-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Small local backend for Blonkyz Runner users and scores.",
+  "scripts": {
+    "start": "node server.js",
+    "setup:supabase": "node scripts/setup-supabase.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
+    "pg": "^8.22.0"
+  }
+}
