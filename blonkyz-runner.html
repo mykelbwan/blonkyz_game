@@ -932,6 +932,7 @@ async function endRun(finalScore){
 ========================================================= */
 const PLAYER_X_FRAC = 0.18;
 const GROUND_Y_FRAC = 0.78;
+const MOBILE_GROUND_Y_FRAC = 0.86;
 const BIRD_UNLOCK_SCORE = 150;   // pterodactyls only start appearing after this score, like the real game
 const NIGHT_INTERVAL = 700;      // day/night flips every 700 points, like the real game
 const JUMP_BUFFER_MS = 140;
@@ -946,6 +947,11 @@ const BIRD_HEIGHTS = [
 ];
 
 function getPhaserConfig(){
+  const isPortraitMobile = window.innerWidth <= 700 && window.innerHeight > window.innerWidth;
+  const gameWidth = isPortraitMobile ? 360 : 640;
+  const gameHeight = isPortraitMobile
+    ? Math.max(640, Math.round(window.innerHeight * (gameWidth / Math.max(1, window.innerWidth))))
+    : 360;
   return {
     type: Phaser.AUTO,
     parent: 'gameCanvasHolder',
@@ -953,8 +959,8 @@ function getPhaserConfig(){
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 640,
-      height: 360
+      width: gameWidth,
+      height: gameHeight
     },
     physics: { default: 'arcade', arcade: { gravity: { y: 2200 }, debug: false } },
     scene: { key: 'main', preload, create, update }
@@ -971,7 +977,8 @@ function preload(){
 
 function create(){
   const w = this.scale.width, h = this.scale.height;
-  this.groundY = h * GROUND_Y_FRAC;
+  const groundFrac = this.scale.height > this.scale.width ? MOBILE_GROUND_Y_FRAC : GROUND_Y_FRAC;
+  this.groundY = h * groundFrac;
   this.playerX = w * PLAYER_X_FRAC;
   this.isDucking = false;
   this.isGrounded = true;
