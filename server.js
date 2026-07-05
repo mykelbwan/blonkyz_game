@@ -12,12 +12,27 @@ function text(res, status, body) {
 }
 
 async function serveStatic(req, res, pathname) {
-  const filePath = pathname === '/' ? path.join(ROOT, 'blonkyz-runner.html') : path.join(ROOT, pathname);
-  const normalized = path.normalize(filePath);
-  if (!normalized.startsWith(ROOT)) return text(res, 403, 'Forbidden');
+  const publicRoot = path.join(ROOT, 'public');
+  const candidates = pathname === '/'
+    ? [path.join(ROOT, 'blonkyz-runner.html')]
+    : [path.join(publicRoot, pathname), path.join(ROOT, pathname)];
 
   try {
-    const data = await fs.readFile(normalized);
+    let normalized = null;
+    let data = null;
+    for (const candidate of candidates) {
+      const next = path.normalize(candidate);
+      if (!next.startsWith(publicRoot) && !next.startsWith(ROOT)) return text(res, 403, 'Forbidden');
+      try {
+        data = await fs.readFile(next);
+        normalized = next;
+        break;
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+    }
+    if (!data) return text(res, 404, 'Not found');
+
     const ext = path.extname(normalized).toLowerCase();
     const types = {
       '.html': 'text/html; charset=utf-8',
