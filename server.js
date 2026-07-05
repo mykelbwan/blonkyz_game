@@ -14,7 +14,7 @@ function text(res, status, body) {
 async function serveStatic(req, res, pathname) {
   const publicRoot = path.join(ROOT, 'public');
   const candidates = pathname === '/'
-    ? [path.join(ROOT, 'blonkyz-runner.html')]
+    ? [path.join(publicRoot, 'index.html')]
     : [path.join(publicRoot, pathname), path.join(ROOT, pathname)];
 
   try {
